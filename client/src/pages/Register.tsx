@@ -3,54 +3,58 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { Lock, Phone, User, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 export default function Register() {
+  const [, setLocation] = useLocation();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const registerMutation = trpc.auth.register.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        setSuccess(true);
+        setTimeout(() => {
+          setLocation("/login");
+        }, 2000);
+      }
+    },
+    onError: (error) => {
+      setError(error.message || "Registration failed");
+    },
+  });
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess(false);
-    setIsLoading(true);
 
-    try {
-      if (!phone || !password || !confirmPassword) {
-        setError("Please fill in all required fields");
-        setIsLoading(false);
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        setError("Passwords do not match");
-        setIsLoading(false);
-        return;
-      }
-
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters");
-        setIsLoading(false);
-        return;
-      }
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      setSuccess(true);
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000);
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (!phone || !password || !confirmPassword) {
+      setError("Please fill in all required fields");
+      return;
     }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    registerMutation.mutate({
+      phone,
+      password,
+      confirmPassword,
+      inviteCode: inviteCode || undefined,
+    });
   };
 
   return (
@@ -163,10 +167,10 @@ export default function Register() {
               {/* Register button */}
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={registerMutation.isPending}
                 className="btn-primary w-full flex items-center justify-center gap-2"
               >
-                {isLoading ? "Creating account..." : (
+                {registerMutation.isPending ? "Creating account..." : (
                   <>
                     Create Account
                     <ArrowRight className="h-4 w-4" />

@@ -89,4 +89,44 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getUserByPhone(phone: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createPhoneUser(phone: string, passwordHash: string, inviteCode: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(users).values({
+    phone,
+    passwordHash,
+    inviteCode,
+    loginMethod: "phone",
+    balance: 0,
+    role: "user",
+    lastSignedIn: new Date(),
+  });
+
+  return result;
+}
+
+export async function updateUserLastSignedIn(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
+}
+
 // TODO: add feature queries here as your schema grows.

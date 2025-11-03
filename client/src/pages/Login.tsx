@@ -4,45 +4,38 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { Lock, Phone, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 export default function Login() {
+  const [, setLocation] = useLocation();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        // Redirect to dashboard
+        setLocation("/dashboard");
+      }
+    },
+    onError: (error) => {
+      setError(error.message || "Login failed");
+    },
+  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
-    try {
-      // TODO: Implement actual login logic
-      // For now, simulate a login attempt
-      if (!phone || !password) {
-        setError("Please enter both phone number and password");
-        setIsLoading(false);
-        return;
-      }
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // For demo: show error for unregistered users
-      if (phone === "0000000000") {
-        // Demo registered user
-        alert("Login successful!");
-        window.location.href = "/dashboard";
-      } else {
-        setError("Login failed: You don't have an account. Please register.");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (!phone || !password) {
+      setError("Please enter both phone number and password");
+      return;
     }
+
+    loginMutation.mutate({ phone, password });
   };
 
   return (
@@ -125,10 +118,10 @@ export default function Login() {
             {/* Login button */}
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={loginMutation.isPending}
               className="btn-primary w-full flex items-center justify-center gap-2"
             >
-              {isLoading ? "Logging in..." : (
+              {loginMutation.isPending ? "Logging in..." : (
                 <>
                   Log in
                   <ArrowRight className="h-4 w-4" />

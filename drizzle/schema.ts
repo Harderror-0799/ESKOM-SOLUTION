@@ -12,10 +12,18 @@ export const users = mysqlTable("users", {
    */
   id: int("id").autoincrement().primaryKey(),
   /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  openId: varchar("openId", { length: 64 }).unique(),
+  /** Phone number for phone/password authentication */
+  phone: varchar("phone", { length: 20 }).unique(),
+  /** Hashed password for phone/password authentication */
+  passwordHash: text("passwordHash"),
   name: text("name"),
   email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
+  loginMethod: varchar("loginMethod", { length: 64 }).default("phone"),
+  /** Referral/invite code */
+  inviteCode: varchar("inviteCode", { length: 64 }).unique(),
+  /** Balance in account */
+  balance: int("balance").default(0),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

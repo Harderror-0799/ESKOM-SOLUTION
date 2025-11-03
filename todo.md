@@ -1,8 +1,8 @@
 # Eskom Investment Platform - TODO
 
 ## Phase 1: Core Features
-- [ ] Database schema with products, users, investments, transactions
-- [ ] User authentication (phone/password login and registration)
+- [x] Database schema with products, users, investments, transactions
+- [x] User authentication (phone/password login and registration with data verification)
 - [ ] Product catalog with images
 - [ ] Product purchase functionality
 - [ ] User dashboard with balance and investments
