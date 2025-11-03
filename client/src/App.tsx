@@ -5,10 +5,13 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
+import ProductPurchase from "./pages/ProductPurchase";
+import Invite from "./pages/Invite";
 import MyProfile from "./pages/MyProfile";
+import Recharge from "./pages/Recharge";
+import { useAuth } from "./_core/hooks/useAuth";
 import { Home, ShoppingBag, Gift, Users, User } from "lucide-react";
 
 function BottomNav() {
@@ -19,10 +22,10 @@ function BottomNav() {
 
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/products", label: "Products", icon: ShoppingBag },
+    { path: "/products", label: "Product", icon: ShoppingBag },
     { path: "/vip", label: "VIP", icon: Gift },
     { path: "/invite", label: "Invite", icon: Users },
-    { path: "/profile", label: "Profile", icon: User },
+    { path: "/profile", label: "My", icon: User },
   ];
 
   return (
@@ -46,8 +49,20 @@ function BottomNav() {
 }
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  // TODO: Implement actual authentication check
-  // For now, all routes are public
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-slate-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
   return <Component />;
 }
 
@@ -55,14 +70,23 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
+      <Route path="/register" component={() => <NotFound />} />
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/products" component={() => <ProtectedRoute component={Products} />} />
+      <Route path="/product/:id" component={() => <ProtectedRoute component={ProductPurchase} />} />
+      <Route path="/invite" component={() => <ProtectedRoute component={Invite} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={MyProfile} />} />
+      <Route path="/recharge" component={() => <ProtectedRoute component={Recharge} />} />
       
-      {/* Placeholder routes */}
+      {/* Placeholder routes for other features */}
       <Route path="/vip" component={() => <ProtectedRoute component={Dashboard} />} />
-      <Route path="/invite" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/withdraw" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/fund-record" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/team" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/application" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/customer-service" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/withdrawal-record" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/team-income" component={() => <ProtectedRoute component={Dashboard} />} />
       
       <Route path={"/"} component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path={"/404"} component={NotFound} />

@@ -1,120 +1,160 @@
-import { APP_LOGO, APP_TITLE } from "@/const";
-import { TrendingUp, Wallet, Target, Users } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useLocation } from "wouter";
+import { Wallet, Users, Zap, Download, MessageCircle, LogOut } from "lucide-react";
 
 export default function Dashboard() {
-  const userBalance = 50000;
-  const totalInvestments = 120000;
-  const teamEarnings = 15000;
-  const activeInvestments = 3;
+  const { user, logout } = useAuth();
+  const [, setLocation] = useLocation();
 
-  const stats = [
-    {
-      label: "Balance",
-      value: `R${userBalance.toLocaleString()}`,
-      icon: Wallet,
-      color: "bg-emerald-500/10 border-emerald-500/50",
-      textColor: "text-emerald-400",
-    },
-    {
-      label: "Total Investments",
-      value: `R${totalInvestments.toLocaleString()}`,
-      icon: TrendingUp,
-      color: "bg-blue-500/10 border-blue-500/50",
-      textColor: "text-blue-400",
-    },
-    {
-      label: "Team Earnings",
-      value: `R${teamEarnings.toLocaleString()}`,
-      icon: Users,
-      color: "bg-purple-500/10 border-purple-500/50",
-      textColor: "text-purple-400",
-    },
-    {
-      label: "Active Investments",
-      value: activeInvestments,
-      icon: Target,
-      color: "bg-orange-500/10 border-orange-500/50",
-      textColor: "text-orange-400",
-    },
-  ];
+  // Mock profile data
+  const profile = {
+    balance: 5000000,
+    teamEarnings: 1500000,
+    points: 3,
+    vipLevel: 2,
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setLocation("/login");
+  };
+
+  const vipLevel = profile?.vipLevel || 0;
+  const nextVipCost = 3000000;
+  const spentAmount = profile?.balance || 0;
+  const progressPercentage = Math.min((spentAmount / nextVipCost) * 100, 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24">
-      {/* Header */}
-      <div className="bg-slate-800/50 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-40">
-        <div className="container py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {APP_LOGO && <img src={APP_LOGO} alt={APP_TITLE} className="h-10 w-10 rounded-lg" />}
-            <div>
-              <h1 className="text-xl font-bold text-white">{APP_TITLE}</h1>
-              <p className="text-xs text-slate-400">Investment Platform</p>
-            </div>
-          </div>
-          <button className="text-slate-400 hover:text-white transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
+      {/* Header with logout */}
+      <div className="sticky top-0 z-40 bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 py-4 flex justify-between items-center">
+        <h1 className="text-white font-bold text-lg">ESKOM SOLUTION</h1>
+        <button
+          onClick={handleLogout}
+          className="text-slate-400 hover:text-emerald-400 transition-colors"
+        >
+          <LogOut className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Main content */}
-      <div className="container py-8">
-        {/* Welcome section */}
-        <div className="mb-8 animate-fade-in">
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome back!</h2>
-          <p className="text-slate-400">Manage your investments and track your earnings</p>
-        </div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={stat.label}
-                className={`card-premium border ${stat.color} animate-slide-up`}
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-slate-400 text-sm font-medium mb-2">{stat.label}</p>
-                    <p className={`text-2xl font-bold ${stat.textColor}`}>{stat.value}</p>
-                  </div>
-                  <Icon className={`h-8 w-8 ${stat.textColor} opacity-50`} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          <Button className="btn-primary h-14 text-base">
-            Browse Products
-          </Button>
-          <Button className="btn-secondary h-14 text-base">
-            Recharge Account
-          </Button>
-        </div>
-
-        {/* Recent investments */}
-        <div className="card-premium">
-          <h3 className="text-lg font-bold text-white mb-6">Recent Investments</h3>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-                <div>
-                  <p className="text-white font-semibold">Coal Power Generator</p>
-                  <p className="text-slate-400 text-sm">Investment ID: #2024{i}001</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-emerald-400 font-semibold">R{(50000 * i).toLocaleString()}</p>
-                  <p className="text-slate-400 text-sm">Active</p>
-                </div>
-              </div>
-            ))}
+      <div className="px-4 py-6 space-y-6">
+        {/* VIP Level Card */}
+        <Card className="bg-gradient-to-r from-teal-600 to-teal-700 border-0 p-6 text-white">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Zap className="h-5 w-5" />
+              <span className="text-sm font-semibold">VIP {vipLevel}</span>
+            </div>
+            <span className="text-xs text-teal-100">
+              To upgrade to the next VIP level, you need to spend R {(nextVipCost / 100).toFixed(2)}
+            </span>
           </div>
+          <div className="w-full bg-teal-800/50 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-emerald-400 h-full transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+        </Card>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="bg-slate-800/50 border-slate-700/50 p-4 text-center">
+            <div className="text-emerald-400 text-2xl font-bold">
+              {profile ? (profile.balance / 100).toFixed(2) : "0.00"}
+            </div>
+            <div className="text-slate-400 text-xs mt-1">Balance (R)</div>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700/50 p-4 text-center">
+            <div className="text-yellow-400 text-2xl font-bold">
+              {profile ? (profile.teamEarnings / 100).toFixed(2) : "0.00"}
+            </div>
+            <div className="text-slate-400 text-xs mt-1">Team (R)</div>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700/50 p-4 text-center">
+            <div className="text-emerald-400 text-2xl font-bold">
+              {profile?.points || 0}
+            </div>
+            <div className="text-slate-400 text-xs mt-1">Points</div>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            onClick={() => setLocation("/recharge")}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-6 rounded-lg flex flex-col items-center space-y-2"
+          >
+            <Wallet className="h-6 w-6" />
+            <span>Recharge</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/withdraw")}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-6 rounded-lg flex flex-col items-center space-y-2"
+          >
+            <Wallet className="h-6 w-6" />
+            <span>Withdraw</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/fund-record")}
+            className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-6 rounded-lg flex flex-col items-center space-y-2"
+          >
+            <Zap className="h-6 w-6" />
+            <span>Fund Record</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/team")}
+            className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-6 rounded-lg flex flex-col items-center space-y-2"
+          >
+            <Users className="h-6 w-6" />
+            <span>My Team</span>
+          </Button>
+        </div>
+
+        {/* Menu Items */}
+        <div className="space-y-3">
+          <Button
+            onClick={() => setLocation("/application")}
+            variant="ghost"
+            className="w-full justify-start text-slate-300 hover:text-emerald-400 hover:bg-slate-800/50"
+          >
+            <Download className="h-5 w-5 mr-3" />
+            <span>Application</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/customer-service")}
+            variant="ghost"
+            className="w-full justify-start text-slate-300 hover:text-emerald-400 hover:bg-slate-800/50"
+          >
+            <MessageCircle className="h-5 w-5 mr-3" />
+            <span>Customer service</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/withdrawal-record")}
+            variant="ghost"
+            className="w-full justify-start text-slate-300 hover:text-emerald-400 hover:bg-slate-800/50"
+          >
+            <Wallet className="h-5 w-5 mr-3" />
+            <span>Withdrawal Record</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/team-income")}
+            variant="ghost"
+            className="w-full justify-start text-slate-300 hover:text-emerald-400 hover:bg-slate-800/50"
+          >
+            <Users className="h-5 w-5 mr-3" />
+            <span>Team Income Record</span>
+          </Button>
+          <Button
+            onClick={() => setLocation("/invite")}
+            variant="ghost"
+            className="w-full justify-start text-slate-300 hover:text-emerald-400 hover:bg-slate-800/50"
+          >
+            <Users className="h-5 w-5 mr-3" />
+            <span>Invite Friend</span>
+          </Button>
         </div>
       </div>
     </div>
