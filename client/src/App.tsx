@@ -5,6 +5,7 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import ProductPurchase from "./pages/ProductPurchase";
@@ -70,7 +71,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
-      <Route path="/register" component={() => <NotFound />} />
+      <Route path="/register" component={Register} />
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/products" component={() => <ProtectedRoute component={Products} />} />
       <Route path="/product/:id" component={() => <ProtectedRoute component={ProductPurchase} />} />
