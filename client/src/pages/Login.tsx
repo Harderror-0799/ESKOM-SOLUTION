@@ -16,17 +16,20 @@ export default function Login() {
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
+      console.log("loginMutation onSuccess:", data);
       if (data.success) {
         // Redirect to dashboard
         setLocation("/dashboard");
       }
     },
     onError: (error) => {
+      console.error("loginMutation onError:", error);
       setError(error.message || "Login failed");
     },
   });
 
   const handleLogin = async (e: React.FormEvent) => {
+    console.log("handleLogin called");
     e.preventDefault();
     setError("");
 
@@ -35,6 +38,7 @@ export default function Login() {
       return;
     }
 
+    console.log("Calling loginMutation.mutate with:", { phone, password });
     loginMutation.mutate({ phone, password });
   };
 
