@@ -9,8 +9,9 @@ import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins,
+  base: mode === "production" ? "/ESKOM-SOLUTION/" : "/",
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -41,4 +42,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));
