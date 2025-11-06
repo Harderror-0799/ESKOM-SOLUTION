@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Page Not Found</title>
+  <script>
+    // Get the current path
+    var path = window.location.pathname;
+    // Get the base path (e.g., /ESKOM-SOLUTION/)
+    var base = path.substring(0, path.lastIndexOf('/ESKOM-SOLUTION/') + 16);
+    // Get the remaining part of the path
+    var rest = path.substring(path.lastIndexOf('/ESKOM-SOLUTION/') + 16);
+    // Redirect to the index.html with the path as a hash fragment
+    // This allows the SPA router (wouter) to pick up the route
+    window.location.replace(base + 'index.html#' + rest);
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
